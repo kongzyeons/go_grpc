@@ -5,6 +5,7 @@ import (
 	"log"
 	"my-package/models"
 	"my-package/repository"
+	"my-package/utils"
 	"net/http"
 )
 
@@ -39,7 +40,9 @@ func (obj userGrpcServer) Register(ctx context.Context, req *RegisterRequest) (r
 		return res, nil
 	}
 
-	users, err := obj.userRepo.GetQuery(models.User{})
+	users, err := obj.userRepo.GetQuery(models.User{
+		Username: req.Username,
+	})
 	if err != nil {
 		res = &RegisterResponse{
 			Error:   true,
@@ -60,7 +63,10 @@ func (obj userGrpcServer) Register(ctx context.Context, req *RegisterRequest) (r
 		return res, nil
 	}
 
-	err = obj.userRepo.Create(models.User{})
+	err = obj.userRepo.Create(models.User{
+		Username: req.Username,
+		Password: utils.HashPassword(req.Password),
+	})
 	if err != nil {
 		res = &RegisterResponse{
 			Error:   true,
@@ -80,7 +86,64 @@ func (obj userGrpcServer) Register(ctx context.Context, req *RegisterRequest) (r
 }
 
 func (obj userGrpcServer) Login(ctx context.Context, req *LoginRequest) (res *LoginResponse, err error) {
-	// Your implementation here
+	if req == nil {
+		res = &LoginResponse{
+			Error:   true,
+			Status:  http.StatusBadRequest,
+			Message: "requie username and password",
+		}
+		log.Println(res.Message)
+		return res, nil
+	}
+	if req.Username == "" || req.Password == "" {
+		res = &LoginResponse{
+			Error:   true,
+			Status:  http.StatusBadRequest,
+			Message: "requie username and password",
+		}
+		log.Println(res.Message)
+		return res, nil
+	}
+
+	users, err := obj.userRepo.GetQuery(models.User{
+		Username: req.Username,
+	})
+	if err != nil {
+		res = &LoginResponse{
+			Error:   true,
+			Status:  http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+		log.Println(res.Message)
+		return res, nil
+	}
+	if len(users) == 0 {
+		res = &LoginResponse{
+			Error:   true,
+			Status:  http.StatusNotFound,
+			Message: "not found username",
+		}
+		log.Println(res.Message)
+		return res, nil
+	}
+
+	if utils.HashPassword(req.Password) != users[0].Password {
+		res = &LoginResponse{
+			Error:   true,
+			Status:  http.StatusInternalServerError,
+			Message: "invalid password",
+		}
+		log.Println(res.Message)
+		return res, nil
+	}
+
+	res = &LoginResponse{
+		Status:   http.StatusOK,
+		Message:  "Login success",
+		Id:       int64(users[0].ID),
+		Username: users[0].Username,
+	}
+	log.Println(res.Message)
 	return res, nil
 }
 
