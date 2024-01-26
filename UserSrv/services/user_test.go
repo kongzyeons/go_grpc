@@ -75,3 +75,39 @@ func TestLogin(t *testing.T) {
 		})
 	}
 }
+
+func TestGetAllUser(t *testing.T) {
+	tests := []struct {
+		nameTest    string
+		errGetQuery error
+		users       []models.User
+		expectUsers []*services.User
+		expect      bool
+	}{
+		{nameTest: "test GetAllUser success", errGetQuery: nil, users: []models.User{{}}, expect: false},
+		{nameTest: "test error repo GetQuery", errGetQuery: errors.New(""), users: []models.User{{}}, expect: true},
+		{nameTest: "test users not found", errGetQuery: nil, users: []models.User{}, expect: true},
+		{nameTest: "test check response users", errGetQuery: nil, users: []models.User{{Username: "A"}}, expectUsers: []*services.User{{Username: "A"}}, expect: false},
+	}
+	for i := range tests {
+		t.Run(tests[i].nameTest, func(t *testing.T) {
+			userRepo := repository.NewuserRepoMock()
+			userRepo.On("GetQuery", mock.AnythingOfType("models.User")).Return(
+				tests[i].users,
+				tests[i].errGetQuery,
+			)
+
+			userSrv := services.NewUserGrpcServer(userRepo)
+
+			res, _ := userSrv.GetAllUser(context.Background(), &services.GetAllUserRequest{})
+
+			if tests[i].nameTest == "test check response users" {
+				assert.Equal(t, tests[i].expectUsers, res.Users)
+				return
+			}
+
+			assert.Equal(t, tests[i].expect, res.Error)
+
+		})
+	}
+}

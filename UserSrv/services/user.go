@@ -148,7 +148,44 @@ func (obj userGrpcServer) Login(ctx context.Context, req *LoginRequest) (res *Lo
 }
 
 func (obj userGrpcServer) GetAllUser(ctx context.Context, req *GetAllUserRequest) (res *GetAllUserResponse, err error) {
-	// Your implementation here
+
+	users, err := obj.userRepo.GetQuery(models.User{})
+	if err != nil {
+		res = &GetAllUserResponse{
+			Error:   true,
+			Status:  http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+		log.Println(res.Message)
+		return res, nil
+	}
+
+	if len(users) == 0 {
+		res = &GetAllUserResponse{
+			Error:   true,
+			Status:  http.StatusNotFound,
+			Message: "users not found",
+		}
+		log.Println(res.Message)
+		return res, nil
+	}
+
+	res = &GetAllUserResponse{
+		Status:  http.StatusOK,
+		Message: "GetAllUser success",
+		Users:   nil,
+	}
+
+	res.Users = make([]*User, 0, len(users))
+	for i := range users {
+		res.Users = append(res.Users, &User{
+			Id:       int64(users[i].ID),
+			Username: users[i].Username,
+			Password: users[i].Password,
+		})
+	}
+
+	log.Println(res.Message)
 	return res, nil
 }
 
