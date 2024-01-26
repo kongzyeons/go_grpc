@@ -1,0 +1,125 @@
+definitions:
+  models.LoginReq:
+    properties:
+      password:
+        example: password
+        type: string
+      username:
+        example: username
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  models.RegisterReq:
+    properties:
+      password:
+        example: password
+        type: string
+      username:
+        example: username
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  models.Response:
+    properties:
+      data: {}
+      error:
+        type: boolean
+      massage:
+        type: string
+      status:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Your API description
+  title: microservice-grpc
+  version: "1.0"
+paths:
+  /api/v1/user/login:
+    post:
+      consumes:
+      - application/json
+      description: Login
+      operationId: Login
+      parameters:
+      - description: User data to be created
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "201":
+          description: Create Ok
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Login
+      tags:
+      - User
+  /api/v1/user/register:
+    post:
+      consumes:
+      - application/json
+      description: Register
+      operationId: Register
+      parameters:
+      - description: User data to be created
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "201":
+          description: Create Ok
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Register
+      tags:
+      - User
+swagger: "2.0"

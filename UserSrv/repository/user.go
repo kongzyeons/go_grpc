@@ -39,7 +39,7 @@ func (obj userRepo) GetQuery(user models.User) (users []models.User, err error) 
 	if len(condition) > 0 {
 		query = fmt.Sprintf(`
 			SELECT * FROM users
-			WHERE "%v"
+			WHERE %v
 		`, strings.Join(condition, " OR "))
 	}
 	err = obj.db.Raw(query).Scan(&users).Error
