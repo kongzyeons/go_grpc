@@ -111,3 +111,44 @@ func TestGetAllUser(t *testing.T) {
 		})
 	}
 }
+
+func TestGetByID(t *testing.T) {
+	tests := []struct {
+		nameTest    string
+		req         *services.GetByIDRequest
+		errGetQuery error
+		users       []models.User
+		expectUser  *services.User
+		expect      bool
+	}{
+		{nameTest: "test GetByID success", req: &services.GetByIDRequest{Id: 1}, errGetQuery: nil, users: []models.User{{}}, expect: false},
+		{nameTest: "test error repo GetQuery", req: &services.GetByIDRequest{Id: 1}, errGetQuery: errors.New(""), users: []models.User{{}}, expect: true},
+		{nameTest: "test user not found", req: &services.GetByIDRequest{Id: 1}, errGetQuery: nil, users: []models.User{}, expect: true},
+		{nameTest: "test check response user", req: &services.GetByIDRequest{Id: 1}, errGetQuery: nil, users: []models.User{{ID: 1}}, expectUser: &services.User{Id: 1}, expect: false},
+		{nameTest: "test error requie request", req: &services.GetByIDRequest{}, errGetQuery: nil, users: []models.User{{}}, expect: true},
+		{nameTest: "test error requie request is mill", req: nil, errGetQuery: nil, users: []models.User{{}}, expect: true},
+	}
+	for i := range tests {
+		t.Run(tests[i].nameTest, func(t *testing.T) {
+
+			userRepo := repository.NewuserRepoMock()
+			userRepo.On("GetQuery", mock.AnythingOfType("models.User")).Return(
+				tests[i].users,
+				tests[i].errGetQuery,
+			)
+
+			userSrv := services.NewUserGrpcServer(userRepo)
+
+			res, _ := userSrv.GetByID(context.Background(), tests[i].req)
+
+			if tests[i].nameTest == "test check response user" {
+				assert.Equal(t, tests[i].expectUser, res.User)
+				return
+			}
+
+			assert.Equal(t, tests[i].expect, res.Error)
+
+		})
+	}
+
+}

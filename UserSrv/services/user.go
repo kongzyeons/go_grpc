@@ -190,7 +190,59 @@ func (obj userGrpcServer) GetAllUser(ctx context.Context, req *GetAllUserRequest
 }
 
 func (obj userGrpcServer) GetByID(ctx context.Context, req *GetByIDRequest) (res *GetByIDResponse, err error) {
-	// Your implementation here
+	if req == nil {
+		res = &GetByIDResponse{
+			Error:   true,
+			Status:  http.StatusBadRequest,
+			Message: "requie id user",
+		}
+		log.Println(res.Message)
+		return res, nil
+	}
+
+	if req.Id == 0 {
+		res = &GetByIDResponse{
+			Error:   true,
+			Status:  http.StatusBadRequest,
+			Message: "requie id user",
+		}
+		log.Println(res.Message)
+		return res, nil
+	}
+
+	users, err := obj.userRepo.GetQuery(models.User{
+		ID: uint(req.Id),
+	})
+	if err != nil {
+		res = &GetByIDResponse{
+			Error:   true,
+			Status:  http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+		log.Println(res.Message)
+		return res, nil
+	}
+
+	if len(users) == 0 {
+		res = &GetByIDResponse{
+			Error:   true,
+			Status:  http.StatusNotFound,
+			Message: "user id not found",
+		}
+		log.Println(res.Message)
+		return res, nil
+	}
+
+	res = &GetByIDResponse{
+		Status:  http.StatusOK,
+		Message: "GetByID success",
+		User: &User{
+			Id:       int64(users[0].ID),
+			Username: users[0].Username,
+			Password: users[0].Password,
+		},
+	}
+	log.Println(res.Message)
 	return res, nil
 }
 
