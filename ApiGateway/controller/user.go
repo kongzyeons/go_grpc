@@ -5,6 +5,7 @@ import (
 	"my-package/models"
 	"my-package/services"
 	"net/http"
+	"strconv"
 
 	_ "my-package/docs"
 
@@ -14,6 +15,8 @@ import (
 type UserRest interface {
 	Register(c *gin.Context)
 	Login(c *gin.Context)
+	GetAllUser(c *gin.Context)
+	GetByID(c *gin.Context)
 }
 
 type userRest struct {
@@ -82,6 +85,56 @@ func (obj userRest) Login(c *gin.Context) {
 		return
 	}
 	res := obj.userSrv.Login(req)
+	log.Println(res.Massage)
+	c.JSON(int(res.Status), res)
+}
+
+// GetAllUser godoc
+// @summary GetAllUser
+// @description GetAllUser
+// @tags User
+// @id GetAllUser
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @response 200 {object} models.Response "OK"
+// @response 201 {object} models.Response "Create Ok"
+// @response 400 {object} models.Response "Bad Request"
+// @response 401 {object} models.Response "Unauthorized"
+// @response 500 {object} models.Response "Internal Server Error"
+// @Router /api/v1/users [get]
+func (obj userRest) GetAllUser(c *gin.Context) {
+	res := obj.userSrv.GetAllUser()
+	log.Println(res.Massage)
+	c.JSON(int(res.Status), res)
+}
+
+// GetByID godoc
+// @summary GetByID
+// @description GetByID
+// @tags User
+// @id GetByID
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param id path string true "id of user to be get"
+// @response 200 {object} models.Response "OK"
+// @response 201 {object} models.Response "Create Ok"
+// @response 400 {object} models.Response "Bad Request"
+// @response 401 {object} models.Response "Unauthorized"
+// @response 500 {object} models.Response "Internal Server Error"
+// @Router /api/v1/user/{id} [get]
+func (obj userRest) GetByID(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Response{
+			Error:   true,
+			Status:  http.StatusBadRequest,
+			Massage: "error invalid ID",
+		})
+		return
+	}
+	res := obj.userSrv.GetByID(id)
 	log.Println(res.Massage)
 	c.JSON(int(res.Status), res)
 }

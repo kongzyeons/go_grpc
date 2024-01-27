@@ -10,6 +10,8 @@ import (
 type UserSrv interface {
 	Register(req models.RegisterReq) (res models.Response)
 	Login(req models.LoginReq) (res models.Response)
+	GetAllUser() (res models.Response)
+	GetByID(id int) (res models.Response)
 }
 
 type userSrv struct {
@@ -55,6 +57,49 @@ func (obj userSrv) Login(req models.LoginReq) (res models.Response) {
 			Username: result.Username,
 			AccToken: "accToken",
 			RefToken: "refToken",
+		},
+	}
+	return res
+}
+
+func (obj userSrv) GetAllUser() (res models.Response) {
+	result, err := obj.userGrpc.GetAllUser(context.Background(), &grpcClient.GetAllUserRequest{})
+	res = utils.HandlerErrGrpcCleint(result, err)
+	if res.Error {
+		return res
+	}
+
+	var users []models.GetAllUserRes
+	for i := range result.Users {
+		users = append(users, models.GetAllUserRes{
+			ID:       int(result.Users[i].Id),
+			Username: result.Users[i].Username,
+		})
+	}
+	res = models.Response{
+		Error:   result.Error,
+		Status:  result.Status,
+		Massage: result.Message,
+		Data:    users,
+	}
+	return res
+}
+
+func (obj userSrv) GetByID(id int) (res models.Response) {
+	result, err := obj.userGrpc.GetByID(context.Background(), &grpcClient.GetByIDRequest{
+		Id: int64(id),
+	})
+	res = utils.HandlerErrGrpcCleint(result, err)
+	if res.Error {
+		return res
+	}
+	res = models.Response{
+		Error:   result.Error,
+		Status:  result.Status,
+		Massage: result.Message,
+		Data: models.GetByIDRes{
+			ID:       int(result.User.Id),
+			Username: result.User.Username,
 		},
 	}
 	return res

@@ -28,4 +28,6 @@ func NewRouterApp(app *gin.Engine, cfg config.Config) {
 
 	app.POST("api/v1/user/register", userRest.Register)
 	app.POST("api/v1/user/login", userRest.Login)
+	app.GET("api/v1/users", userRest.GetAllUser)
+	app.GET("api/v1/user/:id", userRest.GetByID)
 }
