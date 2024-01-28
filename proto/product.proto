@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package ProductGrpc;
+
+service ProductGrpc{
+    rpc CreateProduct(CreateProductRequest) returns(CreateProductResponse);
+    rpc GetAllProduct(GetAllProductRequest) returns(GetAllProductResponse);
+    rpc GetProductID(GetProductIDRequest) returns(GetProductIDResponse);
+
+}
+
+message Product {
+    uint64 id = 1;
+    string name = 2;
+    double price = 3;
+    string category = 4;
+}
+
+// bool error = 1;
+// int64 status = 2;
+// string message = 3;
+
+message CreateProductRequest{
+    string name = 1;
+    double price = 2;
+    string category = 3;
+}
+
+message CreateProductResponse{
+    bool error = 1;
+    int64 status = 2;
+    string message = 3;
+}
+
+message GetAllProductRequest{
+}
+
+message GetAllProductResponse{
+    bool error = 1;
+    int64 status = 2;
+    string message = 3;
+    repeated Product producrs = 4;
+}
+
+message GetProductIDRequest{
+    uint64 id = 1;
+}
+
+message GetProductIDResponse{
+    bool error = 1;
+    int64 status = 2;
+    string message = 3;
+    Product producr = 4;
+}
