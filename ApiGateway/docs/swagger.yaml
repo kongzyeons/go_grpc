@@ -1,4 +1,13 @@
 definitions:
+  models.CreateProductReq:
+    properties:
+      category:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+    type: object
   models.LoginReq:
     properties:
       password:
@@ -40,6 +49,121 @@ info:
   title: microservice-grpc
   version: "1.0"
 paths:
+  /api/v1/product/{id}:
+    get:
+      consumes:
+      - application/json
+      description: GetProductID
+      operationId: GetProductID
+      parameters:
+      - description: id of product to be get
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "201":
+          description: Create Ok
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: GetProductID
+      tags:
+      - Product
+  /api/v1/product/create:
+    post:
+      consumes:
+      - application/json
+      description: CreateProduct
+      operationId: CreateProduct
+      parameters:
+      - description: Product data to be created
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateProductReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "201":
+          description: Create Ok
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: CreateProduct
+      tags:
+      - Product
+  /api/v1/products:
+    get:
+      consumes:
+      - application/json
+      description: GetAllProduct
+      operationId: GetAllProduct
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "201":
+          description: Create Ok
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: GetAllProduct
+      tags:
+      - Product
   /api/v1/user/{id}:
     get:
       consumes:

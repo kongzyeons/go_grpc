@@ -24,7 +24,20 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 	cfg := config.LoadingConfig()
-	defer cfg.UserGrpc.Close()
+	// defer cfg.UserGrpc.Close()
+	// defer cfg.ProductGrpc.Close()
+	defer func() {
+		if err := cfg.ProductGrpc.Close(); err != nil {
+			fmt.Println("Error closing ProductGrpc:", err)
+		}
+	}()
+
+	// Defer closing UserGrpc second (executed first due to reverse order)
+	defer func() {
+		if err := cfg.UserGrpc.Close(); err != nil {
+			fmt.Println("Error closing UserGrpc:", err)
+		}
+	}()
 
 	app := gin.New()
 	routes.NewRouterApp(app, cfg)

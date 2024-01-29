@@ -127,6 +127,7 @@ func (obj userRest) GetAllUser(c *gin.Context) {
 func (obj userRest) GetByID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
+		log.Println("error GetByID :", err)
 		c.JSON(http.StatusBadRequest, models.Response{
 			Error:   true,
 			Status:  http.StatusBadRequest,

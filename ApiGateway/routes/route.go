@@ -30,4 +30,13 @@ func NewRouterApp(app *gin.Engine, cfg config.Config) {
 	app.POST("api/v1/user/login", userRest.Login)
 	app.GET("api/v1/users", userRest.GetAllUser)
 	app.GET("api/v1/user/:id", userRest.GetByID)
+
+	productGrpc := grpcClient.NewProductGrpcClient(cfg.ProductGrpc)
+	productSrv := services.NewProductSrv(productGrpc)
+	productRest := controller.NewProductRest(productSrv)
+
+	app.POST("api/v1/product/create", productRest.CreateProduct)
+	app.GET("api/v1/products", productRest.GetAllProduct)
+	app.GET("api/v1/product/:id", productRest.GetProductID)
+
 }
