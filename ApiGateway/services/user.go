@@ -23,14 +23,16 @@ func NewUserSrv(userGrpc grpcClient.UserGrpcClient) UserSrv {
 }
 
 func (obj userSrv) Register(req models.RegisterReq) (res models.Response) {
+
 	result, err := obj.userGrpc.Register(context.Background(), &grpcClient.RegisterRequest{
 		Username: req.Username,
 		Password: req.Password,
 	})
-	res = utils.HandlerErrGrpcCleint(result, err)
-	if res.Error {
+
+	if res = utils.HandlerErrGrpcCleint(result, err); res.Error {
 		return res
 	}
+
 	res = models.Response{
 		Error:   result.Error,
 		Status:  result.Status,
@@ -44,8 +46,8 @@ func (obj userSrv) Login(req models.LoginReq) (res models.Response) {
 		Username: req.Username,
 		Password: req.Password,
 	})
-	res = utils.HandlerErrGrpcCleint(result, err)
-	if res.Error {
+
+	if res = utils.HandlerErrGrpcCleint(result, err); res.Error {
 		return res
 	}
 	res = models.Response{
@@ -64,8 +66,8 @@ func (obj userSrv) Login(req models.LoginReq) (res models.Response) {
 
 func (obj userSrv) GetAllUser() (res models.Response) {
 	result, err := obj.userGrpc.GetAllUser(context.Background(), &grpcClient.GetAllUserRequest{})
-	res = utils.HandlerErrGrpcCleint(result, err)
-	if res.Error {
+
+	if res = utils.HandlerErrGrpcCleint(result, err); res.Error {
 		return res
 	}
 
@@ -89,8 +91,8 @@ func (obj userSrv) GetByID(id int) (res models.Response) {
 	result, err := obj.userGrpc.GetByID(context.Background(), &grpcClient.GetByIDRequest{
 		Id: int64(id),
 	})
-	res = utils.HandlerErrGrpcCleint(result, err)
-	if res.Error {
+
+	if res = utils.HandlerErrGrpcCleint(result, err); res.Error {
 		return res
 	}
 	res = models.Response{

@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"log"
 	"my-package/config"
-	"my-package/routes"
-
 	_ "my-package/docs"
+	"my-package/routes"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -19,25 +18,14 @@ import (
 // @BasePath
 
 func main() {
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 	cfg := config.LoadingConfig()
-	// defer cfg.UserGrpc.Close()
-	// defer cfg.ProductGrpc.Close()
-	defer func() {
-		if err := cfg.ProductGrpc.Close(); err != nil {
-			fmt.Println("Error closing ProductGrpc:", err)
-		}
-	}()
-
-	// Defer closing UserGrpc second (executed first due to reverse order)
-	defer func() {
-		if err := cfg.UserGrpc.Close(); err != nil {
-			fmt.Println("Error closing UserGrpc:", err)
-		}
-	}()
+	defer cfg.UserGrpc.Close()
+	defer cfg.ProductGrpc.Close()
 
 	app := gin.New()
 	routes.NewRouterApp(app, cfg)

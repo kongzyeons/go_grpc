@@ -19,3 +19,15 @@ protoc product.proto --proto_path=./ \
     --go_opt=Mproduct.proto=../ApiGateway/grpcClient \
     --go-grpc_opt=Mproduct.proto=../ApiGateway/grpcClient \
     --go_out=./ --go-grpc_out=./
+
+
+
+protoc order.proto --proto_path=./ \
+    --go_opt=Morder.proto=../OrderSrv/services \
+    --go-grpc_opt=Morder.proto=../OrderSrv/services \
+    --go_out=./ --go-grpc_out=./
+
+protoc order.proto --proto_path=./ \
+    --go_opt=Morder.proto=../ApiGateway/grpcClient \
+    --go-grpc_opt=Morder.proto=../ApiGateway/grpcClient \
+    --go_out=./ --go-grpc_out=./

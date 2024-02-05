@@ -27,10 +27,11 @@ func (obj productSrv) CreateProduct(req models.CreateProductReq) (res models.Res
 		Price:    req.Price,
 		Category: req.Category,
 	})
-	res = utils.HandlerErrGrpcCleint(result, err)
-	if res.Error {
+
+	if res = utils.HandlerErrGrpcCleint(result, err); res.Error {
 		return res
 	}
+
 	res = models.Response{
 		Error:   result.Error,
 		Status:  result.Status,
@@ -41,8 +42,8 @@ func (obj productSrv) CreateProduct(req models.CreateProductReq) (res models.Res
 
 func (obj productSrv) GetAllProduct() (res models.Response) {
 	result, err := obj.productGrpc.GetAllProduct(context.Background(), &grpcClient.GetAllProductRequest{})
-	res = utils.HandlerErrGrpcCleint(result, err)
-	if res.Error {
+
+	if res = utils.HandlerErrGrpcCleint(result, err); res.Error {
 		return res
 	}
 
@@ -68,10 +69,11 @@ func (obj productSrv) GetProductID(id uint64) (res models.Response) {
 	result, err := obj.productGrpc.GetProductID(context.Background(), &grpcClient.GetProductIDRequest{
 		Id: id,
 	})
-	res = utils.HandlerErrGrpcCleint(result, err)
-	if res.Error {
+
+	if res = utils.HandlerErrGrpcCleint(result, err); res.Error {
 		return res
 	}
+
 	res = models.Response{
 		Error:   res.Error,
 		Status:  res.Status,

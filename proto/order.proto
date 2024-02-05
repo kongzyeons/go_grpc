@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package OrderGrpc;
+
+import "google/protobuf/timestamp.proto";
+
+
+service OrderGrpc{
+    rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+    rpc GetallOrder(GetallOrderRequest) returns (GetallOrderResponse);
+    rpc GetOrderID(GetOrderIDRequest) returns (GetOrderIDResponse);
+    rpc AddProduct(AddProductRequest) returns (AddProductResponse);
+    rpc DeleteOrderID(DeleteOrderIDRequest) returns (DeleteOrderIDResponse);
+};
+
+// bool error = 1;
+// int64 status = 2;
+// string message = 3;
+
+message Order {
+    message Product {
+      uint32 product_id = 1;
+      int32 amount = 2;
+    }  
+    string order_id = 1;
+    uint32 user_id = 2;
+    repeated Product products = 3;
+    string status_order = 4;
+    google.protobuf.Timestamp create_time = 5;
+    google.protobuf.Timestamp update_time = 6;
+  }
+
+
+
+message CreateOrderRequest {
+    uint32 user_id = 1;
+    uint32 product_id = 2;
+    int32 amount = 3;
+};
+
+message CreateOrderResponse{
+    bool error = 1;
+    int64 status = 2;
+    string message = 3;
+}
+
+message GetallOrderRequest {
+};
+
+message GetallOrderResponse{
+    bool error = 1;
+    int64 status = 2;
+    string message = 3;
+    repeated Order Orders =4;
+};
+
+message GetOrderIDRequest{
+    string order_id = 1;
+};
+
+message GetOrderIDResponse {
+    bool error = 1;
+    int64 status = 2;
+    string message = 3;
+    Order Order = 4;
+};
+
+message AddProductRequest {
+    string order_id = 1;
+    uint32 product_id = 2;
+    int32 amount = 3;
+};
+
+message AddProductResponse{
+    bool error = 1;
+    int64 status = 2;
+    string message = 3;
+};
+
+
+message DeleteOrderIDRequest{
+    string order_id = 1;
+}
+
+
+message DeleteOrderIDResponse {
+    bool error = 1;
+    int64 status = 2;
+    string message = 3;
+}
+
+
