@@ -1,4 +1,24 @@
 definitions:
+  models.AddProductReq:
+    properties:
+      amount:
+        type: integer
+      product_id:
+        type: integer
+    required:
+    - amount
+    - product_id
+    type: object
+  models.CreateOrderReq:
+    properties:
+      amount:
+        type: integer
+      product_id:
+        type: integer
+    required:
+    - amount
+    - product_id
+    type: object
   models.CreateProductReq:
     properties:
       category:
@@ -49,6 +69,90 @@ info:
   title: microservice-grpc
   version: "1.0"
 paths:
+  /api/v1/order/{order_id}:
+    put:
+      consumes:
+      - application/json
+      description: AddProduct
+      operationId: AddProduct
+      parameters:
+      - description: order_id
+        in: path
+        name: order_id
+        required: true
+        type: string
+      - description: AddProductReq
+        in: body
+        name: Order
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddProductReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: AddProduct
+      tags:
+      - Order
+  /api/v1/order/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: GetOrderByUser
+      operationId: GetOrderByUser
+      parameters:
+      - description: user_id of user to be get
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: GetOrderByUser
+      tags:
+      - Order
+  /api/v1/order/create/{user_id}:
+    post:
+      consumes:
+      - application/json
+      description: CreateOrder
+      operationId: CreateOrder
+      parameters:
+      - description: user_id of user to be get
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Order data to be created
+        in: body
+        name: Order
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateOrderReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: CreateOrder
+      tags:
+      - Order
   /api/v1/product/{id}:
     get:
       consumes:

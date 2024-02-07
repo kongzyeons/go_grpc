@@ -6,6 +6,8 @@ service ProductGrpc{
     rpc CreateProduct(CreateProductRequest) returns(CreateProductResponse);
     rpc GetAllProduct(GetAllProductRequest) returns(GetAllProductResponse);
     rpc GetProductID(GetProductIDRequest) returns(GetProductIDResponse);
+    rpc GetProductIDStream(stream GetProductIDStreamRequest) returns(stream GetProductIDStreamResponse);
+
 
 }
 
@@ -51,4 +53,23 @@ message GetProductIDResponse{
     int64 status = 2;
     string message = 3;
     Product product = 4;
+}
+
+
+message IndexOrder{
+    int64 idx_order = 1;
+    int64 idx_product=2;
+}
+
+message GetProductIDStreamRequest{
+    IndexOrder idx =1;
+    uint64 id = 2;
+}
+
+message GetProductIDStreamResponse {
+    bool error = 1;
+    int64 status = 2;
+    string message = 3;
+    Product product = 4;
+    IndexOrder idx =5;
 }

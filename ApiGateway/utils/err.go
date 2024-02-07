@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"my-package/models"
 	"net/http"
 )
@@ -13,7 +12,6 @@ type MockResponse interface {
 }
 
 func HandlerErrGrpcCleint[T MockResponse](result T, err error) models.Response {
-	fmt.Println("----", err)
 	if err != nil {
 		res := models.Response{
 			Error:   true,

@@ -9,6 +9,7 @@ service OrderGrpc{
     rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
     rpc GetallOrder(GetallOrderRequest) returns (GetallOrderResponse);
     rpc GetOrderID(GetOrderIDRequest) returns (GetOrderIDResponse);
+    rpc GetOrderByUser(GetOrderByUserRequest) returns(GetOrderByUserResponse);
     rpc AddProduct(AddProductRequest) returns (AddProductResponse);
     rpc DeleteOrderID(DeleteOrderIDRequest) returns (DeleteOrderIDResponse);
 };
@@ -64,6 +65,22 @@ message GetOrderIDResponse {
     string message = 3;
     Order Order = 4;
 };
+
+
+message GetOrderByUserRequest {
+    uint32 user_id = 1;
+}
+
+
+
+message GetOrderByUserResponse {
+    bool error = 1;
+    int64 status = 2;
+    string message = 3;
+    repeated Order Orders =4;
+}
+
+
 
 message AddProductRequest {
     string order_id = 1;

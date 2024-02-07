@@ -10,7 +10,7 @@ type Config struct {
 	AppUrl      string
 	UserGrpc    *grpc.ClientConn
 	ProductGrpc *grpc.ClientConn
-	OrderGrpc   string
+	OrderGrpc   *grpc.ClientConn
 }
 
 func LoadingConfig() Config {
@@ -18,6 +18,7 @@ func LoadingConfig() Config {
 		AppUrl:      os.Getenv("APP_URL"),
 		UserGrpc:    NewClientGrpc(os.Getenv("USER_GRPC")),
 		ProductGrpc: NewClientGrpc(os.Getenv("PRODUCT_GRPC")),
+		OrderGrpc:   NewClientGrpc(os.Getenv("ORDER_GRPC")),
 	}
 	return cfg
 }

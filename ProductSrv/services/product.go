@@ -2,6 +2,7 @@ package services
 
 import (
 	context "context"
+	"io"
 	"log"
 	"my-package/models"
 	"my-package/repository"
@@ -157,21 +158,21 @@ func (obj productGrpcServer) GetProductID(ctx context.Context, req *GetProductID
 		ID: uint(req.Id),
 	})
 
-	if len(products) == 0 {
-		res := &GetProductIDResponse{
-			Error:   true,
-			Status:  http.StatusNotFound,
-			Message: "product id not found",
-		}
-		log.Println(res.Message)
-		return res, nil
-	}
-
 	if err != nil {
 		res := &GetProductIDResponse{
 			Error:   true,
 			Status:  http.StatusInternalServerError,
 			Message: err.Error(),
+		}
+		log.Println(res.Message)
+		return res, nil
+	}
+
+	if len(products) == 0 {
+		res := &GetProductIDResponse{
+			Error:   true,
+			Status:  http.StatusNotFound,
+			Message: "product id not found",
 		}
 		log.Println(res.Message)
 		return res, nil
@@ -191,5 +192,89 @@ func (obj productGrpcServer) GetProductID(ctx context.Context, req *GetProductID
 	return res, nil
 }
 
-// mustEmbedUnimplementedProductGrpcServer is used to embed the unimplemented
-// gRPC server methods. It is required by the grpc library.
+func (obj productGrpcServer) GetProductIDStream(stream ProductGrpc_GetProductIDStreamServer) error {
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			res := &GetProductIDStreamResponse{
+				Error:   true,
+				Status:  http.StatusInternalServerError,
+				Message: err.Error(),
+			}
+			log.Println(res.Message)
+			return stream.Send(res)
+		}
+
+		if req == nil {
+			res := &GetProductIDStreamResponse{
+				Error:   true,
+				Status:  http.StatusBadRequest,
+				Message: "error requie request",
+			}
+			log.Println(res.Message)
+			return stream.Send(res)
+
+		}
+
+		if req.Id == 0 {
+			res := &GetProductIDStreamResponse{
+				Error:   true,
+				Status:  http.StatusBadRequest,
+				Message: "error requie request",
+			}
+			return stream.Send(res)
+		}
+
+		products, err := obj.productRepo.GetQuery(models.Product{
+			ID: uint(req.Id),
+		})
+
+		if err != nil {
+			res := &GetProductIDStreamResponse{
+				Error:   true,
+				Status:  http.StatusInternalServerError,
+				Message: err.Error(),
+			}
+			log.Println(res.Message)
+			return stream.Send(res)
+		}
+
+		if len(products) == 0 {
+			res := &GetProductIDStreamResponse{
+				Error:   true,
+				Status:  http.StatusNotFound,
+				Message: "product id not found",
+			}
+			log.Println(res.Message)
+			return stream.Send(res)
+		}
+
+		res := &GetProductIDStreamResponse{
+			Error:   false,
+			Status:  http.StatusOK,
+			Message: "GetProductID success",
+			Idx:     req.Idx,
+			Product: &Product{
+				Id:       uint64(products[0].ID),
+				Name:     products[0].Name,
+				Price:    products[0].Price,
+				Category: products[0].Category,
+			}}
+		log.Println(res.Message)
+		err = stream.Send(res)
+		if err != nil {
+			res := &GetProductIDStreamResponse{
+				Error:   true,
+				Status:  http.StatusInternalServerError,
+				Message: err.Error(),
+			}
+			log.Println(res.Message)
+			return stream.Send(res)
+		}
+
+	}
+	return nil
+}

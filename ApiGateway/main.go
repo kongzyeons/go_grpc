@@ -26,6 +26,7 @@ func main() {
 	cfg := config.LoadingConfig()
 	defer cfg.UserGrpc.Close()
 	defer cfg.ProductGrpc.Close()
+	defer cfg.OrderGrpc.Close()
 
 	app := gin.New()
 	routes.NewRouterApp(app, cfg)

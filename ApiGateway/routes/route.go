@@ -23,20 +23,27 @@ func NewRouterApp(app *gin.Engine, cfg config.Config) {
 	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	userGrpc := grpcClient.NewUserGrpcClient(cfg.UserGrpc)
-	useSrv := services.NewUserSrv(userGrpc)
-	userRest := controller.NewUserRest(useSrv)
+	productGrpc := grpcClient.NewProductGrpcClient(cfg.ProductGrpc)
+	orderGrpc := grpcClient.NewOrderGrpcClient(cfg.OrderGrpc)
 
+	useSrv := services.NewUserSrv(userGrpc)
+	productSrv := services.NewProductSrv(productGrpc)
+	orderSrv := services.NewOrderSrv(orderGrpc, productGrpc)
+
+	userRest := controller.NewUserRest(useSrv)
 	app.POST("api/v1/user/register", userRest.Register)
 	app.POST("api/v1/user/login", userRest.Login)
 	app.GET("api/v1/users", userRest.GetAllUser)
 	app.GET("api/v1/user/:id", userRest.GetByID)
 
-	productGrpc := grpcClient.NewProductGrpcClient(cfg.ProductGrpc)
-	productSrv := services.NewProductSrv(productGrpc)
 	productRest := controller.NewProductRest(productSrv)
-
 	app.POST("api/v1/product/create", productRest.CreateProduct)
 	app.GET("api/v1/products", productRest.GetAllProduct)
 	app.GET("api/v1/product/:id", productRest.GetProductID)
+
+	orderRest := controller.NewOrderRest(orderSrv)
+	app.POST("api/v1/order/create/:user_id", orderRest.CreateOrder)
+	app.GET("api/v1/order/:user_id", orderRest.GetOrderByUser)
+	app.PUT("api/v1/order/:order_id", orderRest.AddProduct)
 
 }

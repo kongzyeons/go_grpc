@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ProductGrpc_CreateProduct_FullMethodName = "/ProductGrpc.ProductGrpc/CreateProduct"
-	ProductGrpc_GetAllProduct_FullMethodName = "/ProductGrpc.ProductGrpc/GetAllProduct"
-	ProductGrpc_GetProductID_FullMethodName  = "/ProductGrpc.ProductGrpc/GetProductID"
+	ProductGrpc_CreateProduct_FullMethodName      = "/ProductGrpc.ProductGrpc/CreateProduct"
+	ProductGrpc_GetAllProduct_FullMethodName      = "/ProductGrpc.ProductGrpc/GetAllProduct"
+	ProductGrpc_GetProductID_FullMethodName       = "/ProductGrpc.ProductGrpc/GetProductID"
+	ProductGrpc_GetProductIDStream_FullMethodName = "/ProductGrpc.ProductGrpc/GetProductIDStream"
 )
 
 // ProductGrpcClient is the client API for ProductGrpc service.
@@ -31,6 +32,7 @@ type ProductGrpcClient interface {
 	CreateProduct(ctx context.Context, in *CreateProductRequest, opts ...grpc.CallOption) (*CreateProductResponse, error)
 	GetAllProduct(ctx context.Context, in *GetAllProductRequest, opts ...grpc.CallOption) (*GetAllProductResponse, error)
 	GetProductID(ctx context.Context, in *GetProductIDRequest, opts ...grpc.CallOption) (*GetProductIDResponse, error)
+	GetProductIDStream(ctx context.Context, opts ...grpc.CallOption) (ProductGrpc_GetProductIDStreamClient, error)
 }
 
 type productGrpcClient struct {
@@ -68,6 +70,37 @@ func (c *productGrpcClient) GetProductID(ctx context.Context, in *GetProductIDRe
 	return out, nil
 }
 
+func (c *productGrpcClient) GetProductIDStream(ctx context.Context, opts ...grpc.CallOption) (ProductGrpc_GetProductIDStreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &ProductGrpc_ServiceDesc.Streams[0], ProductGrpc_GetProductIDStream_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &productGrpcGetProductIDStreamClient{stream}
+	return x, nil
+}
+
+type ProductGrpc_GetProductIDStreamClient interface {
+	Send(*GetProductIDStreamRequest) error
+	Recv() (*GetProductIDStreamResponse, error)
+	grpc.ClientStream
+}
+
+type productGrpcGetProductIDStreamClient struct {
+	grpc.ClientStream
+}
+
+func (x *productGrpcGetProductIDStreamClient) Send(m *GetProductIDStreamRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *productGrpcGetProductIDStreamClient) Recv() (*GetProductIDStreamResponse, error) {
+	m := new(GetProductIDStreamResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // ProductGrpcServer is the server API for ProductGrpc service.
 // All implementations must embed UnimplementedProductGrpcServer
 // for forward compatibility
@@ -75,6 +108,7 @@ type ProductGrpcServer interface {
 	CreateProduct(context.Context, *CreateProductRequest) (*CreateProductResponse, error)
 	GetAllProduct(context.Context, *GetAllProductRequest) (*GetAllProductResponse, error)
 	GetProductID(context.Context, *GetProductIDRequest) (*GetProductIDResponse, error)
+	GetProductIDStream(ProductGrpc_GetProductIDStreamServer) error
 	mustEmbedUnimplementedProductGrpcServer()
 }
 
@@ -90,6 +124,9 @@ func (UnimplementedProductGrpcServer) GetAllProduct(context.Context, *GetAllProd
 }
 func (UnimplementedProductGrpcServer) GetProductID(context.Context, *GetProductIDRequest) (*GetProductIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProductID not implemented")
+}
+func (UnimplementedProductGrpcServer) GetProductIDStream(ProductGrpc_GetProductIDStreamServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetProductIDStream not implemented")
 }
 func (UnimplementedProductGrpcServer) mustEmbedUnimplementedProductGrpcServer() {}
 
@@ -158,6 +195,32 @@ func _ProductGrpc_GetProductID_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProductGrpc_GetProductIDStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ProductGrpcServer).GetProductIDStream(&productGrpcGetProductIDStreamServer{stream})
+}
+
+type ProductGrpc_GetProductIDStreamServer interface {
+	Send(*GetProductIDStreamResponse) error
+	Recv() (*GetProductIDStreamRequest, error)
+	grpc.ServerStream
+}
+
+type productGrpcGetProductIDStreamServer struct {
+	grpc.ServerStream
+}
+
+func (x *productGrpcGetProductIDStreamServer) Send(m *GetProductIDStreamResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *productGrpcGetProductIDStreamServer) Recv() (*GetProductIDStreamRequest, error) {
+	m := new(GetProductIDStreamRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // ProductGrpc_ServiceDesc is the grpc.ServiceDesc for ProductGrpc service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -178,6 +241,13 @@ var ProductGrpc_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ProductGrpc_GetProductID_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetProductIDStream",
+			Handler:       _ProductGrpc_GetProductIDStream_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "product.proto",
 }
